@@ -9,7 +9,7 @@ const initMongoConnection = async () => {
     });
     console.log('Mongo connection successfully established!');
   } catch (error) {
-    console.error('Mongo connection error:', error.message);
+    console.error('Mongo connection error:', error);
     process.exit(1);
   }
 };
