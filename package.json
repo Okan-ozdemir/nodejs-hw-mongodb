@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "import": "node src/scripts/importContacts.js",
-    "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix"
-  },
+  "dev": "nodemon src/index.js",
+  "import": "node src/scripts/importContacts.js",
+  "lint": "eslint src/",
+  "lint:fix": "eslint src/ --fix",
+  "start": "node src/index.js"
+},
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
