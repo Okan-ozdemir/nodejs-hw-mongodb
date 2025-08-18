@@ -1,23 +1,18 @@
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+const mongoose = require('mongoose');
+require('dotenv').config();
 
-dotenv.config();
-
-export const initMongoConnection = async () => {
-  const { MONGODB_USER, MONGODB_PASSWORD, MONGODB_URL, MONGODB_DB } = process.env;
-
+const initMongoConnection = async () => {
   try {
-    const connectionString = `mongodb+srv://${encodeURIComponent(MONGODB_USER)}:${encodeURIComponent(MONGODB_PASSWORD)}@${MONGODB_URL}/${MONGODB_DB}?retryWrites=true&w=majority&appName=Cluster0`;
-    console.log('Connecting to MongoDB...');
+    const { MONGODB_USER, MONGODB_PASSWORD, MONGODB_URL, MONGODB_DB } = process.env;
+    const connectionString = `mongodb+srv://${MONGODB_USER}:${encodeURIComponent(MONGODB_PASSWORD)}@${MONGODB_URL}/${MONGODB_DB}?retryWrites=true&w=majority`;
     
-    await mongoose.connect(connectionString, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(connectionString);
     
-    console.log('Mongo connection successfully established!');
+    console.log('MongoDB bağlantısı başarılı!');
   } catch (error) {
-    console.error('Mongo connection error:', error.message);
+    console.error('MongoDB bağlantı hatası:', error.message);
     process.exit(1);
   }
 };
+
+module.exports = initMongoConnection;

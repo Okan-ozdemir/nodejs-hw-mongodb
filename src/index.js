@@ -1,10 +1,10 @@
-import 'dotenv/config';
-import { initMongoConnection } from './db/initMongoConnection.js';
-import { setupServer } from './server.js';
+require('dotenv/config');
+const initMongoConnection = require('./db/initMongoConnection');
+require('./server');
 
 const startApp = async () => {
   await initMongoConnection();
-  setupServer();
+  // server.js zaten app.listen ile başlatıyor
 };
 
 startApp();
