@@ -12,6 +12,20 @@ function setupServer() {
   app.use(pino);
   app.use(express.json());
 
+  // Add root route
+  app.get('/', (req, res) => {
+    res.json({
+      message: 'Contacts API is running',
+      endpoints: {
+        getAllContacts: 'GET /contacts',
+        getContact: 'GET /contacts/:contactId',
+        createContact: 'POST /contacts',
+        updateContact: 'PATCH /contacts/:contactId',
+        deleteContact: 'DELETE /contacts/:contactId'
+      }
+    });
+  });
+
   app.use('/contacts', contactsRouter);
 
   app.use(notFoundHandler);
