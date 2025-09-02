@@ -8,4 +8,16 @@ async function getContactById(contactId) {
   return await Contact.findById(contactId);
 }
 
-module.exports = { getAllContacts, getContactById };
+async function createContact(data) {
+  return await Contact.create(data);
+}
+
+async function updateContact(contactId, data) {
+  return await Contact.findByIdAndUpdate(contactId, data, { new: true });
+}
+
+async function deleteContact(contactId) {
+  return await Contact.findByIdAndDelete(contactId);
+}
+
+module.exports = { getAllContacts, getContactById, createContact, updateContact, deleteContact };
