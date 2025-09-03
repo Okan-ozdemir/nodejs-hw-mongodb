@@ -2,7 +2,8 @@ const { getAllContacts, getContactById, createContact, updateContact, deleteCont
 const createHttpError = require('http-errors');
 
 async function getContactsController(req, res) {
-  const contacts = await getAllContacts();
+  const { page = 1, perPage = 10, sortBy, sortOrder, type, isFavourite } = req.query;
+  const contacts = await getAllContacts({ page, perPage, sortBy, sortOrder, type, isFavourite });
   res.status(200).json({
     status: 200,
     message: 'Successfully found contacts!',
