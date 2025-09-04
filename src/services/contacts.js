@@ -1,10 +1,10 @@
 const Contact = require('../db/Contact');
 
-async function getAllContacts({ page = 1, perPage = 10, sortBy = 'name', sortOrder = 'asc', type, isFavourite }) {
+async function getAllContacts({ page = 1, perPage = 10, sortBy = 'name', sortOrder = 'asc', type, isFavourite, userId }) {
   const skip = (page - 1) * perPage;
   const limit = perPage;
 
-  let filter = {};
+  let filter = { userId };
   if (type) {
     filter.contactType = type;
   }
@@ -32,20 +32,20 @@ async function getAllContacts({ page = 1, perPage = 10, sortBy = 'name', sortOrd
   };
 }
 
-async function getContactById(contactId) {
-  return await Contact.findById(contactId);
+async function getContactById(contactId, userId) {
+  return await Contact.findOne({ _id: contactId, userId });
 }
 
 async function createContact(data) {
   return await Contact.create(data);
 }
 
-async function updateContact(contactId, data) {
-  return await Contact.findByIdAndUpdate(contactId, data, { new: true });
+async function updateContact(contactId, data, userId) {
+  return await Contact.findOneAndUpdate({ _id: contactId, userId }, data, { new: true });
 }
 
-async function deleteContact(contactId) {
-  return await Contact.findByIdAndDelete(contactId);
+async function deleteContact(contactId, userId) {
+  return await Contact.findOneAndDelete({ _id: contactId, userId });
 }
 
 module.exports = { getAllContacts, getContactById, createContact, updateContact, deleteContact };

@@ -3,7 +3,8 @@ const createHttpError = require('http-errors');
 
 async function getContactsController(req, res) {
   const { page = 1, perPage = 10, sortBy, sortOrder, type, isFavourite } = req.query;
-  const contacts = await getAllContacts({ page, perPage, sortBy, sortOrder, type, isFavourite });
+  const userId = req.user._id;
+  const contacts = await getAllContacts({ page, perPage, sortBy, sortOrder, type, isFavourite, userId });
   res.status(200).json({
     status: 200,
     message: 'Successfully found contacts!',
@@ -13,7 +14,8 @@ async function getContactsController(req, res) {
 
 async function getContactController(req, res) {
   const { contactId } = req.params;
-  const contact = await getContactById(contactId);
+  const userId = req.user._id;
+  const contact = await getContactById(contactId, userId);
   if (!contact) {
     throw createHttpError(404, "Contact not found");
   }
@@ -26,7 +28,8 @@ async function getContactController(req, res) {
 
 async function createContactController(req, res) {
   const { name, phoneNumber, email, isFavourite, contactType } = req.body;
-  const contact = await createContact({ name, phoneNumber, email, isFavourite, contactType });
+  const userId = req.user._id;
+  const contact = await createContact({ name, phoneNumber, email, isFavourite, contactType, userId });
   res.status(201).json({
     status: 201,
     message: "Successfully created a contact!",
@@ -37,8 +40,9 @@ async function createContactController(req, res) {
 async function updateContactController(req, res) {
   const { contactId } = req.params;
   const { name, phoneNumber, email, isFavourite, contactType } = req.body;
+  const userId = req.user._id;
 
-  const contact = await updateContact(contactId, { name, phoneNumber, email, isFavourite, contactType });
+  const contact = await updateContact(contactId, { name, phoneNumber, email, isFavourite, contactType }, userId);
   if (!contact) {
     throw createHttpError(404, "Contact not found");
   }
@@ -52,7 +56,8 @@ async function updateContactController(req, res) {
 
 async function deleteContactController(req, res) {
   const { contactId } = req.params;
-  const contact = await deleteContact(contactId);
+  const userId = req.user._id;
+  const contact = await deleteContact(contactId, userId);
   if (!contact) {
     throw createHttpError(404, "Contact not found");
   }

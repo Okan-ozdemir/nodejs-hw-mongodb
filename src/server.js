@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const pino = require('pino-http')();
 const contactsRouter = require('./routers/contacts');
+const authRouter = require('./routers/auth');
 const errorHandler = require('./middlewares/errorHandler');
 const notFoundHandler = require('./middlewares/notFoundHandler');
 
@@ -17,15 +18,24 @@ function setupServer() {
     res.json({
       message: 'Contacts API is running',
       endpoints: {
-        getAllContacts: 'GET /contacts',
-        getContact: 'GET /contacts/:contactId',
-        createContact: 'POST /contacts',
-        updateContact: 'PATCH /contacts/:contactId',
-        deleteContact: 'DELETE /contacts/:contactId'
+        auth: {
+          register: 'POST /auth/register',
+          login: 'POST /auth/login',
+          refresh: 'POST /auth/refresh',
+          logout: 'POST /auth/logout'
+        },
+        contacts: {
+          getAllContacts: 'GET /contacts',
+          getContact: 'GET /contacts/:contactId',
+          createContact: 'POST /contacts',
+          updateContact: 'PATCH /contacts/:contactId',
+          deleteContact: 'DELETE /contacts/:contactId'
+        }
       }
     });
   });
 
+  app.use('/auth', authRouter);
   app.use('/contacts', contactsRouter);
 
   app.use(notFoundHandler);
