@@ -20,10 +20,12 @@ async function loginController(req, res) {
 }
 
 async function refreshController(req, res) {
-  const { refreshToken } = req.cookies;
+  let refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+
   if (!refreshToken) {
     throw createHttpError(401, 'Refresh token not provided');
   }
+
   const result = await refreshUserSession(refreshToken);
   res.cookie('refreshToken', result.data.refreshToken, {
     httpOnly: true,
@@ -35,10 +37,17 @@ async function refreshController(req, res) {
 }
 
 async function logoutController(req, res) {
-  const { sessionId } = req.body; // Assuming sessionId is sent in body or from middleware
-  const result = await logoutUser(sessionId);
-  res.clearCookie('refreshToken');
-  res.status(result.status).send();
+  // Get session from authenticated user
+  const userId = req.user._id;
+  const session = await require('../db/Session').findOne({ userId });
+
+  if (session) {
+    const result = await logoutUser(session._id);
+    res.clearCookie('refreshToken');
+    res.status(result.status).send();
+  } else {
+    res.status(204).send();
+  }
 }
 
 module.exports = { registerController, loginController, refreshController, logoutController };
