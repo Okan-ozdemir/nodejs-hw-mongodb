@@ -65,7 +65,7 @@ async function loginUser({ email, password }) {
   return {
     status: 200,
     message: 'Successfully logged in an user!',
-    data: { accessToken },
+    data: { accessToken, refreshToken },
   };
 }
 
