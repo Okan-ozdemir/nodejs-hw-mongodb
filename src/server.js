@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const mongoose = require('mongoose');
 const pino = require('pino-http')();
 const contactsRouter = require('./routers/contacts');
 const authRouter = require('./routers/auth');
@@ -10,6 +12,7 @@ function setupServer() {
   const app = express();
 
   app.use(cors());
+  app.use(cookieParser());
   app.use(pino);
   app.use(express.json());
 
@@ -35,6 +38,15 @@ function setupServer() {
     });
   });
 
+  // Health check for Render
+  app.get('/health', (req, res) => {
+    res.status(200).json({
+      status: 'OK',
+      database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+      timestamp: new Date().toISOString()
+    });
+  });
+
   app.use('/auth', authRouter);
   app.use('/contacts', contactsRouter);
 
@@ -43,7 +55,7 @@ function setupServer() {
 
   const PORT = process.env.PORT || 3000;
 
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
   });
 }

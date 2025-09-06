@@ -94,7 +94,7 @@ async function refreshUserSession(refreshToken) {
     return {
       status: 200,
       message: 'Successfully refreshed a session!',
-      data: { accessToken },
+      data: { accessToken, refreshToken: newRefreshToken },
     };
   } catch (error) {
     throw createHttpError(401, 'Invalid refresh token');
