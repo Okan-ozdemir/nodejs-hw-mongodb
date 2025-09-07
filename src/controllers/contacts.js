@@ -1,4 +1,5 @@
 const { getAllContacts, getContactById, createContact, updateContact, deleteContact } = require('../services/contacts');
+const { uploadToCloudinary } = require('../utils/cloudinary');
 const createHttpError = require('http-errors');
 
 async function getContactsController(req, res) {
@@ -29,7 +30,14 @@ async function getContactController(req, res) {
 async function createContactController(req, res) {
   const { name, phoneNumber, email, isFavourite, contactType } = req.body;
   const userId = req.user._id;
-  const contact = await createContact({ name, phoneNumber, email, isFavourite, contactType, userId });
+  let photo = req.body.photo;
+
+  // If photo file is uploaded, handle Cloudinary upload
+  if (req.file) {
+    photo = await uploadToCloudinary(req.file.path);
+  }
+
+  const contact = await createContact({ name, phoneNumber, email, isFavourite, contactType, photo, userId });
   res.status(201).json({
     status: 201,
     message: "Successfully created a contact!",
@@ -41,8 +49,14 @@ async function updateContactController(req, res) {
   const { contactId } = req.params;
   const { name, phoneNumber, email, isFavourite, contactType } = req.body;
   const userId = req.user._id;
+  let photo = req.body.photo;
 
-  const contact = await updateContact(contactId, { name, phoneNumber, email, isFavourite, contactType }, userId);
+  // If photo file is uploaded, handle Cloudinary upload
+  if (req.file) {
+    photo = await uploadToCloudinary(req.file.path);
+  }
+
+  const contact = await updateContact(contactId, { name, phoneNumber, email, isFavourite, contactType, photo }, userId);
   if (!contact) {
     throw createHttpError(404, "Contact not found");
   }
