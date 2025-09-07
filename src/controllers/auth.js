@@ -1,4 +1,4 @@
-const { registerUser, loginUser, refreshUserSession, logoutUser } = require('../services/auth');
+const { registerUser, loginUser, refreshUserSession, logoutUser, sendResetEmailService, resetPasswordService } = require('../services/auth');
 const createHttpError = require('http-errors');
 
 async function registerController(req, res) {
@@ -50,4 +50,16 @@ async function logoutController(req, res) {
   }
 }
 
-module.exports = { registerController, loginController, refreshController, logoutController };
+async function sendResetEmailController(req, res) {
+  const { email } = req.body;
+  const result = await sendResetEmailService(email);
+  res.status(result.status).json(result);
+}
+
+async function resetPasswordController(req, res) {
+  const { token, password } = req.body;
+  const result = await resetPasswordService(token, password);
+  res.status(result.status).json(result);
+}
+
+module.exports = { registerController, loginController, refreshController, logoutController, sendResetEmailController, resetPasswordController };

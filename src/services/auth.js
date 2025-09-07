@@ -1,10 +1,11 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const User = require('../db/User');
 const Session = require('../db/Session');
 const createHttpError = require('http-errors');
 
-const { JWT_SECRET, JWT_REFRESH_SECRET } = process.env;
+const { JWT_SECRET, JWT_REFRESH_SECRET, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_FROM, APP_DOMAIN } = process.env;
 
 // Helper function to generate tokens
 function generateTokens(userId) {
@@ -106,4 +107,71 @@ async function logoutUser(sessionId) {
   return { status: 204 };
 }
 
-module.exports = { registerUser, loginUser, refreshUserSession, logoutUser };
+async function sendResetEmailService(email) {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw createHttpError(404, 'User not found!');
+  }
+
+  const resetToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: '5m' });
+  const resetLink = `${APP_DOMAIN}/reset-password?token=${resetToken}`;
+
+  const transporter = nodemailer.createTransporter({
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: false,
+    auth: {
+      user: SMTP_USER,
+      pass: SMTP_PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: SMTP_FROM,
+    to: email,
+    subject: 'Password Reset Request',
+    html: `<p>You requested a password reset. Click the link below to reset your password:</p><p><a href="${resetLink}">Reset Password</a></p><p>This link will expire in 5 minutes.</p>`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return {
+      status: 200,
+      message: 'Reset password email has been successfully sent.',
+      data: {},
+    };
+  } catch (error) {
+    throw createHttpError(500, 'Failed to send the email, please try again later.');
+  }
+}
+
+async function resetPasswordService(token, password) {
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    const { email } = payload;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw createHttpError(404, 'User not found!');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.updateOne({ email }, { password: hashedPassword });
+
+    // Delete all sessions for this user
+    await Session.deleteMany({ userId: user._id });
+
+    return {
+      status: 200,
+      message: 'Password has been successfully reset.',
+      data: {},
+    };
+  } catch (error) {
+    if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+      throw createHttpError(401, 'Token is expired or invalid.');
+    }
+    throw error;
+  }
+}
+
+module.exports = { registerUser, loginUser, refreshUserSession, logoutUser, sendResetEmailService, resetPasswordService };
