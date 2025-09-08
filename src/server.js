@@ -25,13 +25,15 @@ function setupServer() {
           register: 'POST /auth/register',
           login: 'POST /auth/login',
           refresh: 'POST /auth/refresh',
-          logout: 'POST /auth/logout'
+          logout: 'POST /auth/logout',
+          sendResetEmail: 'POST /auth/send-reset-email',
+          resetPassword: 'POST /auth/reset-pwd'
         },
         contacts: {
           getAllContacts: 'GET /contacts',
           getContact: 'GET /contacts/:contactId',
-          createContact: 'POST /contacts',
-          updateContact: 'PATCH /contacts/:contactId',
+          createContact: 'POST /contacts (supports photo upload)',
+          updateContact: 'PATCH /contacts/:contactId (supports photo upload)',
           deleteContact: 'DELETE /contacts/:contactId'
         }
       }
