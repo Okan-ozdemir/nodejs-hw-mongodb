@@ -116,7 +116,7 @@ async function sendResetEmailService(email) {
   const resetToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: '5m' });
   const resetLink = `${APP_DOMAIN}/reset-password?token=${resetToken}`;
 
-  const transporter = nodemailer.createTransporter({
+  const transporter = nodemailer.createTransport({
     host: SMTP_HOST,
     port: SMTP_PORT,
     secure: false,
