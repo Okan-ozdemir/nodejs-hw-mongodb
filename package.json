@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "build": "echo 'No build step required'"
+    "build": "npm run build-docs",
+    "build-docs": "redocly bundle --ext json -o docs/swagger.json",
+    "preview-docs": "redocly preview-docs"
   },
   "repository": {
     "type": "git",
@@ -21,6 +23,7 @@
   },
   "homepage": "https://github.com/Okan-ozdemir/nodejs-hw-mongodb#readme",
   "devDependencies": {
+    "@redocly/cli": "^2.1.2",
     "cross-env": "^10.0.0",
     "eslint": "^9.34.0",
     "nodemon": "^3.1.10"
@@ -39,6 +42,7 @@
     "multer": "^2.0.2",
     "nodemailer": "^7.0.6",
     "pino": "^9.9.0",
-    "pino-http": "^10.5.0"
+    "pino-http": "^10.5.0",
+    "swagger-ui-express": "^5.0.1"
   }
 }

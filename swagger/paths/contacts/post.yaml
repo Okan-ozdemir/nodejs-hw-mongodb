@@ -1,0 +1,93 @@
+post:
+  tags:
+    - Contacts
+  summary: Create a new contact
+  operationId: createContact
+  description: Create a new contact with optional photo upload
+  security:
+    - bearerAuth: []
+  requestBody:
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          required:
+            - name
+            - phoneNumber
+            - contactType
+          properties:
+            name:
+              type: string
+              minLength: 3
+              maxLength: 20
+              example: 'Ahmet Yılmaz'
+            phoneNumber:
+              type: string
+              minLength: 3
+              maxLength: 20
+              example: '555-0123'
+            email:
+              type: string
+              minLength: 3
+              maxLength: 20
+              example: 'ahmet@example.com'
+            isFavourite:
+              type: boolean
+              example: false
+            contactType:
+              type: string
+              enum: [work, home, personal]
+              example: 'personal'
+            photo:
+              type: string
+              format: binary
+              description: 'Contact photo file (optional)'
+  responses:
+    '201':
+      description: Contact created successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 201
+              message:
+                type: string
+                example: 'Successfully created a contact!'
+              data:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: '64f1e2b3c4d5e6f7g8h9i0j'
+                  name:
+                    type: string
+                    example: 'Ahmet Yılmaz'
+                  phoneNumber:
+                    type: string
+                    example: '555-0123'
+                  email:
+                    type: string
+                    example: 'ahmet@example.com'
+                  contactType:
+                    type: string
+                    enum: [work, home, personal]
+                    example: 'personal'
+                  photo:
+                    type: string
+                    nullable: true
+                    example: 'https://res.cloudinary.com/.../contact.jpg'
+                  userId:
+                    type: string
+                    example: '64f1e2b3c4d5e6f7g8h9i0k'
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: '2025-09-14T10:30:00.000Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: '2025-09-14T10:30:00.000Z'

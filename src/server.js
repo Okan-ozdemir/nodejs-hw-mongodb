@@ -3,6 +3,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const pino = require('pino-http')();
+const swaggerUi = require('swagger-ui-express');
 const contactsRouter = require('./routers/contacts');
 const authRouter = require('./routers/auth');
 const errorHandler = require('./middlewares/errorHandler');
@@ -16,10 +17,130 @@ function setupServer() {
   app.use(pino);
   app.use(express.json());
 
+  // Swagger documentation
+  const swaggerDocument = {
+    openapi: '3.1.0',
+    info: {
+      version: '1.0.0',
+      title: 'Node.js Contacts API',
+      description: 'A REST API for managing contacts with authentication, email notifications, and image uploads.'
+    },
+    servers: [
+      {
+        url: 'http://localhost:3000',
+        description: 'Development server'
+      },
+      {
+        url: 'https://nodejs-hw-mongodb-hw6-tgzj.onrender.com',
+        description: 'Production server'
+      }
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    },
+    security: [
+      {
+        bearerAuth: []
+      }
+    ],
+    paths: {
+      '/contacts': {
+        get: {
+          tags: ['Contacts'],
+          summary: 'Get all contacts',
+          operationId: 'getAllContacts',
+          security: [{ bearerAuth: [] }],
+          responses: {
+            '200': {
+              description: 'Contacts retrieved successfully'
+            }
+          }
+        },
+        post: {
+          tags: ['Contacts'],
+          summary: 'Create a new contact',
+          operationId: 'createContact',
+          security: [{ bearerAuth: [] }],
+          responses: {
+            '201': {
+              description: 'Contact created successfully'
+            }
+          }
+        }
+      },
+      '/contacts/{id}': {
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Contact ID',
+            schema: { type: 'string' }
+          }
+        ],
+        get: {
+          tags: ['Contacts'],
+          summary: 'Get a specific contact',
+          operationId: 'getContactById',
+          security: [{ bearerAuth: [] }],
+          responses: {
+            '200': {
+              description: 'Contact found successfully'
+            },
+            '404': {
+              description: 'Contact not found'
+            }
+          }
+        },
+        patch: {
+          tags: ['Contacts'],
+          summary: 'Update a contact',
+          operationId: 'updateContact',
+          security: [{ bearerAuth: [] }],
+          responses: {
+            '200': {
+              description: 'Contact updated successfully'
+            },
+            '404': {
+              description: 'Contact not found'
+            }
+          }
+        },
+        delete: {
+          tags: ['Contacts'],
+          summary: 'Delete a contact',
+          operationId: 'deleteContact',
+          security: [{ bearerAuth: [] }],
+          responses: {
+            '204': {
+              description: 'Contact deleted successfully'
+            },
+            '404': {
+              description: 'Contact not found'
+            }
+          }
+        }
+      }
+    }
+  };
+
+  // Swagger UI route
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
   // Add root route
   app.get('/', (req, res) => {
     res.json({
       message: 'Contacts API is running',
+      documentation: {
+        swaggerUI: 'GET /api-docs',
+        redoc: 'GET /docs/index.html'
+      },
       endpoints: {
         auth: {
           register: 'POST /auth/register',

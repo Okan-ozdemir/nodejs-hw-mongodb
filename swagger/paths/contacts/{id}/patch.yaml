@@ -1,0 +1,110 @@
+patch:
+  tags:
+    - Contacts
+  summary: Update a specific contact
+  operationId: updateContact
+  description: Update contact information with optional photo upload
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: Unique identifier of the contact
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          minProperties: 1
+          properties:
+            name:
+              type: string
+              minLength: 3
+              maxLength: 20
+              example: 'Ahmet Yılmaz Updated'
+            phoneNumber:
+              type: string
+              minLength: 3
+              maxLength: 20
+              example: '555-0456'
+            email:
+              type: string
+              minLength: 3
+              maxLength: 20
+              example: 'ahmet.updated@example.com'
+            isFavourite:
+              type: boolean
+              example: true
+            contactType:
+              type: string
+              enum: [work, home, personal]
+              example: 'work'
+            photo:
+              type: string
+              format: binary
+              description: 'New contact photo file (optional)'
+  responses:
+    '200':
+      description: Contact updated successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: 'Successfully patched a contact!'
+              data:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: '64f1e2b3c4d5e6f7g8h9i0j'
+                  name:
+                    type: string
+                    example: 'Ahmet Yılmaz Updated'
+                  phoneNumber:
+                    type: string
+                    example: '555-0456'
+                  email:
+                    type: string
+                    example: 'ahmet.updated@example.com'
+                  contactType:
+                    type: string
+                    enum: [work, home, personal]
+                    example: 'work'
+                  photo:
+                    type: string
+                    nullable: true
+                    example: 'https://res.cloudinary.com/.../updated.jpg'
+                  userId:
+                    type: string
+                    example: '64f1e2b3c4d5e6f7g8h9i0k'
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: '2025-09-14T10:30:00.000Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: '2025-09-14T11:45:00.000Z'
+    '404':
+      description: Contact not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 404
+              message:
+                type: string
+                example: 'Contact not found'
